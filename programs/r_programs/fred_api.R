@@ -75,7 +75,7 @@ save(real_gdp_data, file = "programs/prepped_data/real_gdp_data.rda")
 
 
 ##########################################
-##  PER CAPITAL PERSONAL IMCOME         ##
+##  PER CAPITA PERSONAL IMCOME         ##
 ##########################################
 
 ## DATA IS IN DOLARS
@@ -107,7 +107,7 @@ for(fred_api_code in fred_api_codes) {
   # remove null values
   df <- df %>% filter(!value == '.')
   # Change column name of df
-  colnames(df) <- c('year', 'per_capital_personal_income')
+  colnames(df) <- c('year', 'per_capita_personal_income')
   # strip off unneed characters from year
   df$year <- gsub('-01-01', '', df$year)
   # change year to numeric
@@ -115,30 +115,30 @@ for(fred_api_code in fred_api_codes) {
   # Add State code and name to df
   df$fred_api_code <- fred_api_code
   # Convert gdp column to numeric
-  df$per_capital_personal_income <- as.numeric(df$per_capital_personal_income)
+  df$per_capita_personal_income <- as.numeric(df$per_capita_personal_income)
   
   # Save df to list
   datalist[[fred_api_code]] <- df
 }
 
 # Extract data from datalist into dataframe
-per_capital_personal_income_data <- do.call(rbind, datalist)
+per_capita_personal_income_data <- do.call(rbind, datalist)
 
 # join state name to data
-per_capital_personal_income_data <- per_capital_personal_income_data %>% 
+per_capita_personal_income_data <- per_capita_personal_income_data %>% 
   inner_join(codes_df)
 
 # drop fred_api_code
-per_capital_personal_income_data$fred_api_code <- NULL
+per_capita_personal_income_data$fred_api_code <- NULL
 
 # remove row names
-rownames(per_capital_personal_income_data) <- NULL
+rownames(per_capita_personal_income_data) <- NULL
 
 # drop unneeded years
-per_capital_personal_income_data <- per_capital_personal_income_data %>% filter(year > 2005)
+per_capita_personal_income_data <- per_capital_personal_income_data %>% filter(year > 2005)
 
 # Save data frame
-save(per_capital_personal_income_data, file = "programs/prepped_data/per_capital_personal_income_data.rda")
+save(per_capita_personal_income_data, file = "programs/prepped_data/per_capita_personal_income_data.rda")
 
 
 ##########################################
