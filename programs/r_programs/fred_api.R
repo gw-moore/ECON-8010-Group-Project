@@ -438,7 +438,7 @@ rownames(civilian_labor_force_data) <- NULL
 
 # drop unneeded years
 civilian_labor_force_data <- civilian_labor_force_data %>% filter(year > 2005)
-civilian_labor_force_data <- civilian_labor_force_data %>% filter(year == 2018)
+civilian_labor_force_data <- civilian_labor_force_data %>% filter(year != 2018)
 
 # Save data frame
 save(civilian_labor_force_data, file = "programs/prepped_data/civilian_labor_force_data.rda")
