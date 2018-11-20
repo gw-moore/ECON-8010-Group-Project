@@ -23,8 +23,6 @@ gini_index_data <- tibble()
 edit_table <- function(table_name, year){
   # assign table to function varible
   data <- table_name
-  # remove first row
-  data <- data[-1,]
   # add year variable
   data$year <- year
   # change name of columns
