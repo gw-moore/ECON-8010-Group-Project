@@ -39,5 +39,9 @@ modeling_data <- union_df %>%
   inner_join(bachelors_degree_or_higher_data) %>% 
   inner_join(yearly_unemployment_data)
 
+modeling_data <- as.tibble(modeling_data)
+
+# save data
+save(modeling_data, file = "modeling_data.rda")
 
 

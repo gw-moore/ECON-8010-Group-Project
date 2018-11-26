@@ -172,7 +172,7 @@ datalist <- list()
 # For loop to loop over msa_codes and query GDP data from FRED
 for(fred_api_code in fred_api_codes) {
   # Creating the URL to pull data from census bureau
-  resURL <- paste0('https://api.stlouisfed.org/fred/series/observations?series_id=', fred_api_code,'&api_key=a2541dacf2fe0876e9ad7748fc97a381&file_type=json')
+  resURL <- paste0('https://api.stlouisfed.org/fred/series/observations?series_id=', 'STTMINWGAR','&api_key=a2541dacf2fe0876e9ad7748fc97a381&file_type=json')
   
   # Pull in JSON data and storing in json_list
   json_list <- fromJSON(resURL)
@@ -232,8 +232,7 @@ state_min_wage_data <- rbind(state_min_wage_data, removed_states_data)
 state_min_wage_data <- arrange(state_min_wage_data, state_name, year)
 
 # Save data frame
-save(state_min_wage_data, file = "programs/prepped_data/state_min_wage_data.rda")
-
+save(state_min_wage_data, file = "state_min_wage_data.rda")
 
 
 ################################################
