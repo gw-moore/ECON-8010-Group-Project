@@ -13,6 +13,8 @@ load('population_data.rda')#
 load('real_gdp_data.rda')#
 load('state_min_wage_data.rda')#
 load('union_participation_data.rda')#
+load('homeownership_rate_data.rda')#
+
 
 #obs = current population survey sample size
 #covered = covered by collective bargaining
@@ -37,7 +39,8 @@ modeling_data <- union_df %>%
   inner_join(per_capita_personal_income_data) %>% 
   inner_join(civilian_labor_force_data) %>% 
   inner_join(bachelors_degree_or_higher_data) %>% 
-  inner_join(yearly_unemployment_data)
+  inner_join(yearly_unemployment_data) %>% 
+  inner_join(homeownership_rate_data)
 
 modeling_data <- as.tibble(modeling_data)
 

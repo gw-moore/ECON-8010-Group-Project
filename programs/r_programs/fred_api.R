@@ -515,3 +515,72 @@ yearly_unemployment_data <- yearly_unemployment_data %>% filter(year != 2018)
 
 # Save data frame
 save(yearly_unemployment_data, file = "programs/prepped_data/yearly_unemployment_data.rda")
+
+
+################################################
+##  HOMEOWNERSHIP RATE   ##
+################################################
+
+## DATA IN PERCENTS, NOT SEASONLLY ADJUSTED
+
+# create api series codes
+ur_code <- rep('HOWN', 50)
+
+# Join together state abb and series code to make fred series code
+fred_api_codes <- paste0(state_abb, ur_code)
+
+# create data frame of fred code and state name
+codes_df <- data_frame(fred_api_codes, state_name)
+colnames(codes_df) <- c('fred_api_code', 'state_name')
+
+# Initilize empty list
+datalist <- list()
+
+# For loop to loop over msa_codes and query GDP data from FRED
+for(fred_api_code in fred_api_codes) {
+  # Creating the URL to pull data from census bureau
+  resURL <- paste0('https://api.stlouisfed.org/fred/series/observations?series_id=', fred_api_code,'&api_key=a2541dacf2fe0876e9ad7748fc97a381&file_type=json')
+  
+  # Pull in JSON data and storing in json_list
+  json_list <- fromJSON(resURL)
+  # Convert json_list to data frame
+  df <- as_data_frame(json_list$observations)
+  # Remove first two columns
+  df <- df[,-c(1:2)]
+  # remove null values
+  df <- df %>% filter(!value == '.')
+  # Change column name of df
+  colnames(df) <- c('year', 'homeownership_rate')
+  # change civilian labor force to number
+  df$homeownership_rate <- as.numeric(df$homeownership_rate)
+  # strip off unneed characters from year
+  df$year <- gsub('-\\d*', '', df$year)
+  # change year to numeric
+  df$year <- as.numeric(df$year)
+  # Add State code and name to df
+  df$fred_api_code <- fred_api_code
+  
+  # Save df to list
+  datalist[[fred_api_code]] <- df
+}
+
+# Extract data from datalist into dataframe
+homeownership_rate_data <- do.call(rbind, datalist)
+
+# join state name to data
+homeownership_rate_data <- homeownership_rate_data %>% 
+  inner_join(codes_df)
+
+# drop fred_api_code
+homeownership_rate_data$fred_api_code <- NULL
+
+# remove row names
+rownames(homeownership_rate_data) <- NULL
+
+# drop unneeded years
+homeownership_rate_data <- homeownership_rate_data %>% filter(year > 2005)
+homeownership_rate_data <- homeownership_rate_data %>% filter(year != 2018)
+
+# Save data frame
+save(homeownership_rate_data, file = "programs/prepped_data/homeownership_rate_data.rda")
+
