@@ -73,32 +73,33 @@ modeling_data %>% select(gdp_in_millions, lagged_gdp_in_millions)
 
 nonlagged_formula <- gini_index ~ percent_union_members + population + gdp_in_millions + state_min_wage_rate + per_capital_personal_income +  perc_w_bach_deg_or_higher + yearly_avg_unemply_rate + homeownership_rate
 
-lagged_formual <- gini_index ~ lagged_percent_union_members + lagged_population + lagged_gdp_in_millions + lagged_state_min_wage_rate + lagged_per_capital_personal_income +  lagged_perc_w_bach_deg_or_higher + lagged_yearly_avg_unemply_rate + lagged_homeownership_rate
+lagged_formula <- gini_index ~ lagged_percent_union_members + lagged_gdp_in_millions + lagged_state_min_wage_rate + lagged_perc_w_bach_deg_or_higher + lagged_yearly_avg_unemply_rate + lagged_homeownership_rate
 
 # fit models
 
 # pooled regression model
-pooled_reg <- plm(data = modeling_data, formula = formula, index = c('state_name', 'year'), model = 'pooling')
+pooled_reg <- plm(data = modeling_data, formula = lagged_formula, index = c('state_name', 'year'), model = 'pooling')
 
 summary(pooled_reg)
 
 # fixed effects model
-fix_effects_reg <- plm(data = modeling_data, formula = formula, index = c('state_name', 'year'), model = 'within')
-
+fix_effects_reg <- plm(data = modeling_data, formula = lagged_formula, index = c('state_name', 'year'), model = 'within', effect = 'individual')
 summary(fix_effects_reg)
+
+# fixed effect with time
+fix_effects_time <- plm(data = modeling_data, formula = gini_index ~ lagged_percent_union_members + lagged_gdp_in_millions + lagged_state_min_wage_rate + lagged_perc_w_bach_deg_or_higher + lagged_yearly_avg_unemply_rate + lagged_homeownership_rate + factor(year) + factor(state_name), index = c('state_name', 'year'), model = 'within', effect = 'individual')
+
+summary(fix_effects_time)
 
 # print out fixed effect for states
 fixef(fix_effects_reg)
 
+# compare fixed and fixed time
+pFtest(fix_effects_time, fix_effects_reg)
+
 # compare pooled and fixed effects
 pFtest(fix_effects_reg, pooled_reg) 
-  
-# random effect model
-rand_effect_reg <- plm(data = modeling_data, formula = formula, index = c('state_name', 'year'), model = 'random')
+phtest(fix_effects_reg, pooled_reg)
 
-summary(rand_effect_reg)
-
-# hausman test
-# h.null = random effects model is the correct model
-# h.alt = fixed effect model is a better fit
-phtest(fix_effects_reg, rand_effect_reg)
+# test for time-fixed effects
+plmtest(fix_effects_reg, c("time"), type=("bp"))
