@@ -167,12 +167,12 @@ codes_df <- codes_df %>% filter(!state_abb %in% c('AL', 'TN', 'MS', 'LA', 'SC'))
 fred_api_codes <- pull(codes_df, fred_api_code)
 
 # Initilize empty list
-datalist <- list()
-
+dataframe <- data_frame()
+  
 # For loop to loop over msa_codes and query GDP data from FRED
 for(fred_api_code in fred_api_codes) {
   # Creating the URL to pull data from census bureau
-  resURL <- paste0('https://api.stlouisfed.org/fred/series/observations?series_id=', 'STTMINWGAR','&api_key=a2541dacf2fe0876e9ad7748fc97a381&file_type=json')
+  resURL <- paste0('https://api.stlouisfed.org/fred/series/observations?series_id=', fred_api_code,'&api_key=a2541dacf2fe0876e9ad7748fc97a381&file_type=json')
   
   # Pull in JSON data and storing in json_list
   json_list <- fromJSON(resURL)
@@ -194,11 +194,12 @@ for(fred_api_code in fred_api_codes) {
   df$state_min_wage_rate <- as.numeric(df$state_min_wage_rate)
   
   # Save df to list
-  datalist[[fred_api_code]] <- df
+  dataframe <- rbind(dataframe, df)
 }
 
 # Extract data from datalist into dataframe
-state_min_wage_data <- do.call(rbind, datalist)
+state_min_wage_data <- dataframe
+rm(dataframe)
 
 # join state name to data
 state_min_wage_data <- state_min_wage_data %>% 
