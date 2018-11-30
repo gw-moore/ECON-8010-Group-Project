@@ -215,7 +215,6 @@ rownames(state_min_wage_data) <- NULL
 state_min_wage_data <- state_min_wage_data %>% filter(year > 2005)
 state_min_wage_data <- state_min_wage_data %>% filter(year <= 2017)
 
-
 # add back removed states
 years <- data_frame(c(2006:2017))
 years$fake <- 1
@@ -417,7 +416,7 @@ for(fred_api_code in fred_api_codes) {
   # strip off unneed characters from year
   df$year <- gsub('-\\d*', '', df$year)
   # average by year
-  df <- df %>% group_by(year) %>% mutate(yearly_avg_clf = mean(civilian_labor_force))
+  df <- df %>% group_by(year) %>% mutate(yearly_avg_clf = mean(civilian_labor_force)) %>% ungroup()
   # get distinct obs by year/state
   df <- df %>% select(-civilian_labor_force) %>% distinct()
   # change year to numeric
@@ -491,7 +490,7 @@ for(fred_api_code in fred_api_codes) {
   # strip off unneed characters from year
   df$year <- gsub('-\\d*', '', df$year)
   # average by year
-  df <- df %>% group_by(year) %>% mutate(yearly_avg_unemply_rate = mean(unemployment_rate))
+  df <- df %>% group_by(year) %>% mutate(yearly_avg_unemply_rate = mean(unemployment_rate)) %>% ungroup()
   # get distinct obs by year/state
   df <- df %>% select(-unemployment_rate) %>% distinct()
   # change year to numeric
