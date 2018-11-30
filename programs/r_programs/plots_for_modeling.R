@@ -82,5 +82,3 @@ modeling_data %>% ggplot(aes(x = state_min_wage_rate , y = gini_index)) +
   ggtitle('Heterogeneity Bias Across States') +
   xlab('State Minimum Wage') +
   ylab('Gini Index')
-
-
