@@ -166,7 +166,7 @@ codes_df <- codes_df %>% filter(!state_abb %in% c('AL', 'TN', 'MS', 'LA', 'SC'))
 
 fred_api_codes <- pull(codes_df, fred_api_code)
 
-# Initilize empty list
+# Initilize empty data frame
 dataframe <- data_frame()
   
 # For loop to loop over msa_codes and query GDP data from FRED
@@ -213,6 +213,8 @@ rownames(state_min_wage_data) <- NULL
 
 # drop unneeded years
 state_min_wage_data <- state_min_wage_data %>% filter(year > 2005)
+state_min_wage_data <- state_min_wage_data %>% filter(year <= 2017)
+
 
 # add back removed states
 years <- data_frame(c(2006:2017))
@@ -226,8 +228,14 @@ min_wages <- data_frame(rep(c(5.15, 5.85, 6.55, 7.25, 7.25, 7.25, 7.25, 7.25, 7.
 removed_states_data <- cbind(removed_states_data, min_wages)
 colnames(removed_states_data) <- c('year', 'state_name', 'state_min_wage_rate')
 
+# add year of 2006 to AZ
+# AZ didn't have state min wage until 2007, so adding fed min wage for 2006
+az_2006 <- data_frame(2006, 'Arizona', 5.15)
+colnames(az_2006) <- c('year', 'state_name', 'state_min_wage_rate')
+
 # rbind removed states to full data frame
 state_min_wage_data <- rbind(state_min_wage_data, removed_states_data)
+state_min_wage_data <- rbind(state_min_wage_data, az_2006)
 
 # rearrange
 state_min_wage_data <- arrange(state_min_wage_data, state_name, year)
