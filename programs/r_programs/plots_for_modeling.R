@@ -43,14 +43,14 @@ modeling_data %>% ggplot(aes(x = lagged_percent_union_members, y = gini_index)) 
   xlab('Percent of Workforce who are Union Memeber') +
   ylab('Gini Index')
 
-# gini vs gdp
+# gini vs rgdp
 modeling_data %>% ggplot(aes(x = lagged_gdp_in_millions , y = gini_index)) + 
   geom_smooth(method = 'lm', se = F, color = 'black') + 
   geom_smooth(data = modeling_data, aes(color = state_name), method = 'lm', se = F) +
   geom_point(aes(x = percent_union_members , y = gini_index, color = state_name, alpha = .1)) +
   theme(legend.position="none") +
   ggtitle('Heterogeneity Bias Across States') +
-  xlab('GDP') +
+  xlab('RGDP') +
   ylab('Gini Index')
 
 # gini vs percent w/ bach or higher
@@ -81,4 +81,14 @@ modeling_data %>% ggplot(aes(x = state_min_wage_rate , y = gini_index)) +
   theme(legend.position="none") +
   ggtitle('Heterogeneity Bias Across States') +
   xlab('State Minimum Wage') +
+  ylab('Gini Index')
+
+# gini vs min wage
+modeling_data %>% ggplot(aes(x = yearly_avg_unemply_rate , y = gini_index)) + 
+  geom_smooth(method = 'lm', se = F, color = 'black') + 
+  geom_smooth(data = modeling_data, aes(color = state_name), method = 'lm', se = F) +
+  geom_point(aes(x = yearly_avg_unemply_rate , y = gini_index, color = state_name, alpha = .1)) +
+  theme(legend.position="none") +
+  ggtitle('Heterogeneity Bias Across States') +
+  ylab('Avg Yearly Unemployment Rate w/ CI') +
   ylab('Gini Index')
