@@ -25,7 +25,7 @@ pooled_reg <- plm(data = modeling_data, formula = gini_index ~ lagged_percent_un
 summary(pooled_reg)
 
 # fixed effects model using PLM
-fix_effects_reg <- plm(data = modeling_data, formula = gini_index ~ lagged_percent_union_members + lagged_gdp_in_millions + lagged_state_min_wage_rate + lagged_perc_w_bach_deg_or_higher + lagged_yearly_avg_unemply_rate + lagged_yearly_avg_unemply_rate_squared + homeownership_rate, index = c('state_name', 'year'), model = 'within', effect = 'twoways')
+fix_effects_reg <- plm(data = modeling_data, formula = gini_index ~ lagged_percent_union_members + lagged_gdp_in_millions + lagged_state_min_wage_rate + lagged_perc_w_bach_deg_or_higher + lagged_yearly_avg_unemply_rate + lagged_yearly_avg_unemply_rate_squared + lagged_homeownership_rate, index = c('state_name', 'year'), model = 'within', effect = 'twoways')
 
 # print summary
 summary(fix_effects_reg)
