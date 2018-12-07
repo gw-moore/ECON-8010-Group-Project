@@ -6,7 +6,7 @@ library(lmtest)
 library(car)
 library(sandwich)
 library(pls)
-options("scipen"=10, "digits"=8)
+options("scipen"=100, "digits"=8)
 
 # load data
 load('programs/prepped_data/modeling_data.rda')
