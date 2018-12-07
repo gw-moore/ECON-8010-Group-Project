@@ -4,7 +4,6 @@ library(tidyverse)
 library(plm)
 library(lmtest)
 library(car)
-library(lmtest)
 library(sandwich)
 library(pls)
 options("scipen"=10, "digits"=8)
@@ -12,17 +11,21 @@ options("scipen"=10, "digits"=8)
 # load data
 load('programs/prepped_data/modeling_data.rda')
 
+######
+# calculate RGDP growth
+modeling_data <- modeling_data %>%  mutate(rgdp_growth_rate = (gdp_in_millions - lagged_gdp_in_millions) / lagged_gdp_in_millions)
+
 #############################
 # fit models
 #############################
 
 # pooled regression model
-pooled_reg <- plm(data = modeling_data, formula = gini_index ~ lagged_percent_union_members + lagged_gdp_in_millions  + lagged_gdp_in_millions_squared + lagged_state_min_wage_rate + lagged_perc_w_bach_deg_or_higher + lagged_yearly_avg_unemply_rate + lagged_yearly_avg_unemply_rate_squared + lagged_homeownership_rate, index = c('state_name', 'year'), model = 'pooling')
+pooled_reg <- plm(data = modeling_data, formula = gini_index ~ lagged_percent_union_members + lagged_gdp_in_millions + lagged_state_min_wage_rate + lagged_perc_w_bach_deg_or_higher + lagged_yearly_avg_unemply_rate + lagged_yearly_avg_unemply_rate_squared + homeownership_rate, index = c('state_name', 'year'), model = 'pooling')
 
 summary(pooled_reg)
 
 # fixed effects model using PLM
-fix_effects_reg <- plm(data = modeling_data, formula = gini_index ~ lagged_percent_union_members + lagged_gdp_in_millions + lagged_gdp_in_millions_squared + lagged_state_min_wage_rate + lagged_perc_w_bach_deg_or_higher + lagged_yearly_avg_unemply_rate + lagged_yearly_avg_unemply_rate_squared + homeownership_rate, index = c('state_name', 'year'), model = 'within', effect = 'twoways')
+fix_effects_reg <- plm(data = modeling_data, formula = gini_index ~ lagged_percent_union_members + lagged_gdp_in_millions + lagged_state_min_wage_rate + lagged_perc_w_bach_deg_or_higher + lagged_yearly_avg_unemply_rate + lagged_yearly_avg_unemply_rate_squared + homeownership_rate, index = c('state_name', 'year'), model = 'within', effect = 'twoways')
 
 # print summary
 summary(fix_effects_reg)
@@ -72,20 +75,8 @@ coeftest(fix_effects_reg, vcov = vcovHC(fix_effects_reg, method = 'arellano'))
 # testing for multicolinearity
 # using pooled ols model because vif doesn't work for plm models. Also, multicollinearity is only
 # about the independent varibles, there is no need to coltrol for individual effects to estimate vif
-vif(pooled_reg)
-
-# our model is effected by multicolinearity
-# fitting a partial least squares model to address multicolinearity
-plsr <- plsr(data = modeling_data, formula = gini_index ~ lagged_percent_union_members + lagged_gdp_in_millions + lagged_gdp_in_millions_squared + lagged_state_min_wage_rate + lagged_perc_w_bach_deg_or_higher + lagged_yearly_avg_unemply_rate + lagged_yearly_avg_unemply_rate_squared + lagged_homeownership_rate)
-
-summary(plsr)
-coefplot(plsr)
-
-# refit model w/o homeownership rate and check vif again
-lsdv_mod_wo_hor <- lm(modeling_data, gini_index ~ lagged_percent_union_members + lagged_gdp_in_millions + lagged_gdp_in_millions_squared + lagged_state_min_wage_rate + lagged_perc_w_bach_deg_or_higher + lagged_yearly_avg_unemply_rate + lagged_yearly_avg_unemply_rate_squared + factor(state_name) + factor(year) - 1)
-
-vif(lsdv_mod_wo_hor)
-
+vif <- as.data.frame(vif(pooled_reg))
+write.csv(vif, 'outputs/vif.csv')
 
 # fit lsdv model
 lsdv_mod <- lm(formula = gini_index ~ lagged_percent_union_members + lagged_gdp_in_millions + lagged_gdp_in_millions_squared + lagged_state_min_wage_rate + lagged_perc_w_bach_deg_or_higher + lagged_yearly_avg_unemply_rate + lagged_yearly_avg_unemply_rate_squared + homeownership_rate + factor(state_name) + factor(year) - 1, data = modeling_data)
