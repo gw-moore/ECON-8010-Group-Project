@@ -2,6 +2,7 @@
 setwd("~/School/Fall_2018/Econometrics/ECON-8010-Group-Project")
 library(corrplot)
 library(tidyverse)
+library(ggridges)
 
 ###########################
 # Correlation plot
@@ -90,5 +91,32 @@ modeling_data %>% ggplot(aes(x = yearly_avg_unemply_rate , y = gini_index)) +
   geom_point(aes(x = yearly_avg_unemply_rate , y = gini_index, color = state_name, alpha = .1)) +
   theme(legend.position="none") +
   ggtitle('Heterogeneity Bias Across States') +
-  ylab('Avg Yearly Unemployment Rate w/ CI') +
+  xlab('Avg Yearly Unemployment Rate w/ CI') +
   ylab('Gini Index')
+
+########################
+# joy plot
+
+# percent union members
+modeling_data %>% ggplot(aes(x = percent_union_members , y = state_name, color = state_name)) + 
+  geom_density_ridges() +
+  theme(legend.position="none") +
+  ggtitle('Distribution of Union Participation Rate by State') +
+  xlab('Union Participation Rate') +
+  ylab('State')
+
+modeling_data %>% mutate(year_char = as.character(year)) %>% 
+  ggplot(aes(x = percent_union_members , y = year_char, color = year_char)) + 
+  geom_density_ridges() +
+  theme(legend.position="none") +
+  ggtitle('Distribution of Union Participation Rate by Year') +
+  xlab('Union Participation Rate') +
+  ylab('Year')
+
+modeling_data %>% mutate(year_char = as.character(year)) %>% 
+  ggplot(aes(x = homeownership_rate , y = year_char, color = year_char)) + 
+  geom_density_ridges() +
+  theme(legend.position="none") +
+  ggtitle('Distribution of Homeownership Rate by Year') +
+  xlab('Homeownership Rate') +
+  ylab('Year')

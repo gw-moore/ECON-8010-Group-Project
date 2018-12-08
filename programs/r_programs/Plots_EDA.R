@@ -1,16 +1,19 @@
 #set working directory
 
+setwd()
+
 # Packages
 
 #install.packages("ggmap")
 #install.packages("maps")
 #install.packages("mapdata")
-install.packages("stargazer")
-install.packages("psych")
-install.packages("rdataviewer")
-install.packages("devtools")
-
-devtools::install_github("UrbanInstitute/urbnmapr")
+#install.packages("stargazer")
+#install.packages("psych")
+#install.packages("rdataviewer")
+#install.packages("devtools")
+#devtools::install_github("UrbanInstitute/urbnmapr")
+#install.packages("ggjoy")
+install.packages("ggridges")
 
 library(ggplot2)
 library(ggfortify)
@@ -30,6 +33,8 @@ library(mapdata)
 library(stargazer)
 library(psych)
 library(urbnmapr)
+library(ggjoy)
+library(ggridges)
 
 ##########################
 # Structure
@@ -57,7 +62,6 @@ gg_miss_var(data[1:13])+
 ##########################
 # Correlation Plot
 ##########################
-
 
 corr <- round(cor(data[3:13]), 2)
 
@@ -93,10 +97,6 @@ modeling_data %>% ggplot(aes(x = lagged_perc_w_bach_deg_or_higher, y = gini_inde
   ylab("Gini Coefficient")+
   ggtitle("College Education and Wealth Distribution")
 
-# 0 - perfect equality
-# 1 - perfect INequality
-# Pretty obvious upward trend. Higher percentage of bachelor's degrees = higher gini inex (more inequality)
-
 # gini vs home ownership rate
 modeling_data %>% ggplot(aes(x = homeownership_rate , y = gini_index)) + 
   geom_smooth(method = 'lm', se = F, color = 'black') + 
@@ -106,10 +106,6 @@ modeling_data %>% ggplot(aes(x = homeownership_rate , y = gini_index)) +
   ggtitle('Homeownership and Wealth Distribution') +
   xlab('Homeownership Rate') +
   ylab('Gini Index')
-
-# appears to be a negative trend here. As homeownership increases
-# gini decreases (wealth more evenly distributed
-
 
 # gini vs min wage
 modeling_data %>% ggplot(aes(x = lagged_state_min_wage_rate, y = gini_index)) + geom_point(size = 4)
@@ -123,8 +119,6 @@ modeling_data %>% ggplot(aes(x = lagged_homeownership_rate, y = gini_index)) + g
   facet_wrap(~state_name)
 
 ggplot() + geom_polygon(data=fifty_states, aes(x=long, y=lat, group = group),color="white", fill="grey92" )
-
-
 
 ###########################
 # Variables Mapped
@@ -173,4 +167,107 @@ mapping_data %>%
   labs(fill = "Bachelor's Degree or Higher")
 
 
+############################
+# Time Plots
+###########################
 
+# Gini Index over time
+
+ggplot(data, aes(x=year, y=gini_index))+
+  geom_point(aes(color = percent_union_members))+
+  geom_smooth(method="lm", data = data, size = .5, color = "black")+
+  theme(legend.position="none")+
+  xlab("Year")+
+  ylab("Gini Index")+
+  ggtitle("Gini Index over Time")
+
+# Percent Bachelor's degree or higher over time
+
+ggplot(data, aes(x=year, y=perc_w_bach_deg_or_higher))+
+  geom_point(aes(color = state_name))+
+  geom_smooth(method="lm", data = data, size = .5, color = "black")+
+  theme(legend.position = "none")+
+  xlab("Year")+
+  ylab("Bachelor's Degrees or Higher (%)")+
+  ggtitle("Bachelor's Degrees in the U.S.")
+
+# Union Members over time
+
+ggplot(data, aes(x=year, y=percent_union_members))+
+  geom_point(aes(color = state_name))+
+  geom_smooth(method="lm", data = data, size = .5, color = "black")+
+  theme(legend.position = "none")+
+  xlab("Year")+
+  ylab("Union Members (%)")+
+  ggtitle("Union Members in the U.S.")
+
+###################################
+# Distributions across states
+###################################
+
+# Education
+
+ggplot(data, aes(x=perc_w_bach_deg_or_higher, y= state_name, color=state_name))+
+  geom_joy(scale = 5, alpha = .5, panel_scaling = TRUE)+
+  theme(legend.position="none")+
+  xlab("% Bachelor's or Higher")+
+  ylab("State")+
+  ggtitle("Bachelor's Degrees across States")
+
+# Gini
+
+ggplot(data, aes(x=gini_index, y= state_name, color = state_name))+
+  geom_joy(scale = 5, alpha = .5, panel_scaling = TRUE)+
+  theme(legend.position="none")+
+  xlab("Gini Index")+
+  ylab("State")+
+  ggtitle("Gini Index by State")
+
+# % union Members
+
+ggplot(data, aes(x=percent_union_members, y=state_name, color = state_name))+
+  geom_joy(scale = 5, alpha = .5, panel_scaling = TRUE)+
+  theme(legend.position="none")+
+  xlab("% Union Members")+
+  ylab("State")+
+  ggtitle("Union Members by State")
+
+# Homeownership by year
+
+modeling_data %>% mutate(year_char = as.character(year)) %>% 
+  ggplot(aes(x = homeownership_rate , y = year_char, alpha = .35)) + 
+  geom_density_ridges() +
+  theme(legend.position="none") +
+  ggtitle('Distribution of Homeownership Rate by Year') +
+  xlab('Homeownership Rate') +
+  ylab('Year')
+
+# Gini by year
+
+modeling_data %>% mutate(year_char = as.character(year)) %>% 
+  ggplot(aes(x = gini_index , y = year_char, alpha = .1)) + 
+  geom_density_ridges() +
+  theme(legend.position="none") +
+  ggtitle('Gini Index by Year') +
+  xlab('Gini Index') +
+  ylab('Year')
+
+# Union by Year
+
+modeling_data %>% mutate(year_char = as.character(year)) %>% 
+  ggplot(aes(x = percent_union_members , y = year_char, alpha = .1)) + 
+  geom_density_ridges() +
+  theme(legend.position="none") +
+  ggtitle('Union Members by Year') +
+  xlab('Union Members (%)') +
+  ylab('Year')
+
+# Bachelor's
+
+modeling_data %>% mutate(year_char = as.character(year)) %>% 
+  ggplot(aes(x = perc_w_bach_deg_or_higher , y = year_char, alpha = .1)) + 
+  geom_density_ridges() +
+  theme(legend.position="none") +
+  ggtitle('Education over the Years') +
+  xlab('Bachelor Degree or Higher (%)') +
+  ylab('Year')
